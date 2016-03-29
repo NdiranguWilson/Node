@@ -4,22 +4,18 @@
  */
 
 
-// get  all the currencies and their current status
-var http = require("http");
-var fs = require("fs");
 
+var http = require('http'),
+  fs = require('fs'),
+  url = require('url');
+//variable for holding data that is to be printed on the webpage
+var dat;
 
-fs.readFile('Index.html', function(err, html) {
-  if (err) {
-    throw err;
-  }
-  http.createServer(function(request, res) {
-    res.writeHeader(200, {
-      "Content-Type": "text/html"
-    });
-    res.write(html);
+http.createServer(function(request, response) {
 
-
+  var path = require('url').parse(request.url).pathname;
+  if (path == "/getstring") {
+    console.log("request recieved");
     url = "http://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=json";
 
 
@@ -44,18 +40,34 @@ fs.readFile('Index.html', function(err, html) {
         data = JSON.parse(buffer);
         Quotes = data.list.resources;
         //data.list.resources.length
+        dat = JSON.stringify(data);
 
 
-        for (i = 0; i < 10; i++) {
 
-          console.log((Quotes[i].resource.fields));
+        console.log((Quotes[0].resource.fields));
 
-        }
+
+
 
       });
     });
+    response.writeHead(200, {
+      "Content-Type": "text/plain"
+    });
+    response.end(dat);
+    console.log("Data logged");
+  } else {
+    fs.readFile('Index.html', function(err, file) {
+      if (err) {
+        // write an error response or nothing here
+        return;
+      }
+      response.writeHead(200, {
+        'Content-Type': 'text/html',
 
-    res.end();
-  }).listen(3000); // Activates this server, listening on port 8080.
-
-});
+      });
+      response.end(file, "utf-8");
+    });
+  }
+}).listen(8001);
+console.log("server initialized");

@@ -26,16 +26,51 @@
 
     <div id="symbol" class="small-2 large-4 columns">
       <h2>Currency Symbol</h2>
+
     </div>
-    <div id="" class="small-2 large-4 columns">
-      <h2>Percentage change</h2>
+    <div id="time" class="small-2 large-4 columns">
+      <h2>Time</h2>
     </div>
     <div id="price" class="small-2 large-4 columns">
       <h2> Currency Price</h2>
+      <p id=p rice>
+
+      </p>
     </div>
 
   </header>
+  <script type="text/javascript">
+    xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", "http://localhost:8001/getstring", true);
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        string = xmlhttp.responseText;
+        to_json = JSON.parse(string);
+        data = to_json.list.resources;
+        var currency_symbol = document.getElementById("symbol");
+        var currency_price = document.getElementById("price");
+        var currency_time = document.getElementById("time");
 
+        for (i = 0; i < data.length; i++) {
+          symbol_heading = document.createElement('h3');
+          time_heading = document.createElement('h3');
+          price_heading = document.createElement('h3');
+          symbol = document.createTextNode(JSON.stringify(data[i].resource.fields.name).replace(/['"]+/g, '') + "\n");
+          time = document.createTextNode(JSON.stringify(data[i].resource.fields.utctime).replace(/['"]+/g, '') + "\n");
+          price = document.createTextNode(JSON.stringify(data[i].resource.fields.price).replace(/['"]+/g, '') + "\n");
+          symbol_heading.appendChild(symbol);
+          time_heading.appendChild(time);
+          price_heading.appendChild(price);
+          currency_symbol.appendChild(symbol_heading);
+          currency_price.appendChild(price_heading);
+          currency_time.appendChild(time_heading);
+
+
+        }
+      }
+    }
+    xmlhttp.send();
+  </script>
 
 </body>
 
